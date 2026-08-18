@@ -1,0 +1,41 @@
+{
+    "stock_code": "600519",
+    "company_name": "贵州茅台(模拟)",
+    "industry": "白酒",
+    "years": [2020, 2021, 2022, 2023, 2024],
+    "balance_sheet": {
+        "2020": {"money_funds": 182000000000, "accounts_receivable": 0, "inventory": 28800000000, "fixed_assets": 15800000000, "intangible_assets": 0, "goodwill": 0, "deferred_tax_assets": 450000000, "other_receivables": 120000000, "other_payables": 680000000, "contract_assets": 0, "short_term_borrowings": 0, "long_term_borrowings": 0, "bonds_payable": 0, "current_assets": 220000000000, "total_assets": 259000000000, "current_liabilities": 52000000000, "total_liabilities": 56000000000, "net_equity": 203000000000},
+        "2021": {"money_funds": 194000000000, "accounts_receivable": 0, "inventory": 33400000000, "fixed_assets": 16900000000, "intangible_assets": 0, "goodwill": 0, "deferred_tax_assets": 520000000, "other_receivables": 125000000, "other_payables": 710000000, "contract_assets": 0, "short_term_borrowings": 0, "long_term_borrowings": 0, "bonds_payable": 0, "current_assets": 231000000000, "total_assets": 273000000000, "current_liabilities": 59000000000, "total_liabilities": 63000000000, "net_equity": 210000000000},
+        "2022": {"money_funds": 216000000000, "accounts_receivable": 0, "inventory": 38900000000, "fixed_assets": 17800000000, "intangible_assets": 0, "goodwill": 0, "deferred_tax_assets": 580000000, "other_receivables": 130000000, "other_payables": 750000000, "contract_assets": 0, "short_term_borrowings": 0, "long_term_borrowings": 0, "bonds_payable": 0, "current_assets": 257000000000, "total_assets": 304000000000, "current_liabilities": 65000000000, "total_liabilities": 69000000000, "net_equity": 235000000000},
+        "2023": {"money_funds": 235000000000, "accounts_receivable": 0, "inventory": 46200000000, "fixed_assets": 18500000000, "intangible_assets": 0, "goodwill": 0, "deferred_tax_assets": 520000000, "other_receivables": 126000000, "other_payables": 780000000, "contract_assets": 0, "short_term_borrowings": 0, "long_term_borrowings": 0, "bonds_payable": 0, "current_assets": 286000000000, "total_assets": 338000000000, "current_liabilities": 68000000000, "total_liabilities": 72000000000, "net_equity": 266000000000},
+        "2024": {"money_funds": 265000000000, "accounts_receivable": 0, "inventory": 54300000000, "fixed_assets": 19100000000, "intangible_assets": 0, "goodwill": 0, "deferred_tax_assets": 560000000, "other_receivables": 133000000, "other_payables": 820000000, "contract_assets": 0, "short_term_borrowings": 0, "long_term_borrowings": 0, "bonds_payable": 0, "current_assets": 334000000000, "total_assets": 385000000000, "current_liabilities": 75000000000, "total_liabilities": 79000000000, "net_equity": 306000000000}
+    },
+    "income_statement": {
+        "2020": {"revenue": 98000000000, "cost_of_sales": 8300000000, "selling_expenses": 2800000000, "admin_expenses": 6300000000, "rd_expenses": 54000000, "finance_expenses": -320000000, "asset_impairment_loss": 0, "credit_impairment_loss": 0, "net_profit": 46700000000, "deducted_net_profit": 46700000000, "income_tax": 11800000000, "total_profit": 58500000000, "interest_income": 2800000000, "interest_expense": 28000000, "non_recurring_pl": 0, "share_based_payment": 0, "rd_capitalized": 0, "rd_total": 54000000},
+        "2021": {"revenue": 109500000000, "cost_of_sales": 9200000000, "selling_expenses": 3100000000, "admin_expenses": 6800000000, "rd_expenses": 62000000, "finance_expenses": -490000000, "asset_impairment_loss": 0, "credit_impairment_loss": 0, "net_profit": 52400000000, "deducted_net_profit": 52400000000, "income_tax": 13200000000, "total_profit": 65600000000, "interest_income": 3400000000, "interest_expense": 32000000, "non_recurring_pl": 0, "share_based_payment": 0, "rd_capitalized": 0, "rd_total": 62000000},
+        "2022": {"revenue": 127500000000, "cost_of_sales": 10200000000, "selling_expenses": 3600000000, "admin_expenses": 7500000000, "rd_expenses": 135000000, "finance_expenses": -580000000, "asset_impairment_loss": 0, "credit_impairment_loss": 0, "net_profit": 62700000000, "deducted_net_profit": 62700000000, "income_tax": 15700000000, "total_profit": 78400000000, "interest_income": 4100000000, "interest_expense": 40000000, "non_recurring_pl": 0, "share_based_payment": 0, "rd_capitalized": 0, "rd_total": 135000000},
+        "2023": {"revenue": 150500000000, "cost_of_sales": 11800000000, "selling_expenses": 4100000000, "admin_expenses": 8200000000, "rd_expenses": 235000000, "finance_expenses": -720000000, "asset_impairment_loss": 0, "credit_impairment_loss": 0, "net_profit": 74700000000, "deducted_net_profit": 74700000000, "income_tax": 18700000000, "total_profit": 93400000000, "interest_income": 5100000000, "interest_expense": 48000000, "non_recurring_pl": 0, "share_based_payment": 0, "rd_capitalized": 0, "rd_total": 235000000},
+        "2024": {"revenue": 174000000000, "cost_of_sales": 13200000000, "selling_expenses": 4600000000, "admin_expenses": 8900000000, "rd_expenses": 320000000, "finance_expenses": -950000000, "asset_impairment_loss": 0, "credit_impairment_loss": 0, "net_profit": 87100000000, "deducted_net_profit": 87100000000, "income_tax": 21800000000, "total_profit": 108900000000, "interest_income": 6100000000, "interest_expense": 55000000, "non_recurring_pl": 0, "share_based_payment": 0, "rd_capitalized": 0, "rd_total": 320000000}
+    },
+    "cashflow_statement": {
+        "2020": {"operating_cf": 51000000000, "investing_cf": -3500000000, "financing_cf": -28000000000, "sales_cash_received": 101000000000, "capex": 2200000000},
+        "2021": {"operating_cf": 58000000000, "investing_cf": -4200000000, "financing_cf": -31000000000, "sales_cash_received": 115000000000, "capex": 2500000000},
+        "2022": {"operating_cf": 66000000000, "investing_cf": -5100000000, "financing_cf": -35000000000, "sales_cash_received": 131000000000, "capex": 3100000000},
+        "2023": {"operating_cf": 76000000000, "investing_cf": -6200000000, "financing_cf": -38000000000, "sales_cash_received": 157000000000, "capex": 3800000000},
+        "2024": {"operating_cf": 88000000000, "investing_cf": -7800000000, "financing_cf": -42000000000, "sales_cash_received": 181000000000, "capex": 4500000000}
+    },
+    "notes": {},
+    "non_financial": {
+        "audit_opinion": "标准无保留意见",
+        "pledge_ratio": 0.0,
+        "policy_changes_3yr": 0,
+        "correction_amount_total": 0,
+        "forecast_revisions_2yr": 0,
+        "revision_magnitude": 0,
+        "q4_revenue_pct": 0.26,
+        "rpt_price_deviation": 0.0,
+        "employee_count": 31000,
+        "employee_count_prev": 30000,
+        "top5_customer_ratio": 0.03
+    }
+}

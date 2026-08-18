@@ -1,0 +1,32 @@
+{
+    "stock_code": "600518",
+    "company_name": "康美药业(模拟数据)",
+    "industry": "医药制造",
+    "years": [2016, 2017, 2018],
+    "balance_sheet": {
+        "2016": {"money_funds": 31800000000, "accounts_receivable": 5200000000, "inventory": 4950000000, "fixed_assets": 8200000000, "intangible_assets": 280000000, "goodwill": 130000000, "deferred_tax_assets": 89000000, "other_receivables": 330000000, "other_payables": 120000000, "contract_assets": 0, "short_term_borrowings": 9800000000, "long_term_borrowings": 6800000000, "bonds_payable": 4900000000, "current_assets": 29600000000, "total_assets": 48200000000, "current_liabilities": 18700000000, "total_liabilities": 26800000000, "net_equity": 21400000000},
+        "2017": {"money_funds": 34151000000, "accounts_receivable": 6130000000, "inventory": 19540000000, "fixed_assets": 9100000000, "intangible_assets": 310000000, "goodwill": 150000000, "deferred_tax_assets": 105000000, "other_receivables": 410000000, "other_payables": 145000000, "contract_assets": 80000000, "short_term_borrowings": 12900000000, "long_term_borrowings": 7700000000, "bonds_payable": 12200000000, "current_assets": 38300000000, "total_assets": 57400000000, "current_liabilities": 23500000000, "total_liabilities": 34200000000, "net_equity": 23200000000},
+        "2018": {"money_funds": 18390000000, "accounts_receivable": 4800000000, "inventory": 34200000000, "fixed_assets": 8800000000, "intangible_assets": 290000000, "goodwill": 120000000, "deferred_tax_assets": 140000000, "other_receivables": 15800000000, "other_payables": 230000000, "contract_assets": 150000000, "short_term_borrowings": 14800000000, "long_term_borrowings": 9200000000, "bonds_payable": 8000000000, "current_assets": 42800000000, "total_assets": 62100000000, "current_liabilities": 28200000000, "total_liabilities": 39800000000, "net_equity": 22300000000}
+    },
+    "income_statement": {
+        "2016": {"revenue": 21600000000, "cost_of_sales": 15800000000, "selling_expenses": 980000000, "admin_expenses": 1250000000, "rd_expenses": 180000000, "finance_expenses": 780000000, "asset_impairment_loss": 120000000, "credit_impairment_loss": 80000000, "net_profit": 3350000000, "deducted_net_profit": 3220000000, "income_tax": 580000000, "total_profit": 3930000000, "interest_income": 41000000, "interest_expense": 1050000000, "non_recurring_pl": 130000000, "share_based_payment": 0, "rd_capitalized": 0, "rd_total": 180000000},
+        "2017": {"revenue": 26400000000, "cost_of_sales": 18600000000, "selling_expenses": 1250000000, "admin_expenses": 1480000000, "rd_expenses": 210000000, "finance_expenses": 1240000000, "asset_impairment_loss": 150000000, "credit_impairment_loss": 100000000, "net_profit": 4100000000, "deducted_net_profit": 3980000000, "income_tax": 680000000, "total_profit": 4780000000, "interest_income": 41000000, "interest_expense": 1240000000, "non_recurring_pl": 120000000, "share_based_payment": 0, "rd_capitalized": 0, "rd_total": 210000000},
+        "2018": {"revenue": 19300000000, "cost_of_sales": 14500000000, "selling_expenses": 980000000, "admin_expenses": 1380000000, "rd_expenses": 160000000, "finance_expenses": 1450000000, "asset_impairment_loss": 520000000, "credit_impairment_loss": 380000000, "net_profit": -4650000000, "deducted_net_profit": -4980000000, "income_tax": -120000000, "total_profit": -4770000000, "interest_income": 35000000, "interest_expense": 1450000000, "non_recurring_pl": 330000000, "share_based_payment": 0, "rd_capitalized": 0, "rd_total": 160000000}
+    },
+    "cashflow_statement": {
+        "2016": {"operating_cf": 2100000000, "investing_cf": -3500000000, "financing_cf": 5200000000, "sales_cash_received": 19800000000, "capex": 1800000000},
+        "2017": {"operating_cf": 1840000000, "investing_cf": -4200000000, "financing_cf": 6800000000, "sales_cash_received": 23500000000, "capex": 2100000000},
+        "2018": {"operating_cf": -580000000, "investing_cf": -2500000000, "financing_cf": 1200000000, "sales_cash_received": 16800000000, "capex": 1200000000}
+    },
+    "notes": {},
+    "non_financial": {
+        "audit_opinion": "保留意见",
+        "pledge_ratio": 0.85,
+        "policy_changes_3yr": 2,
+        "correction_amount_total": 500000000,
+        "forecast_revisions_2yr": 3,
+        "revision_magnitude": 0.65,
+        "q4_revenue_pct": 0.38,
+        "rpt_price_deviation": 0.22
+    }
+}
