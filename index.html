@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A股财务排雷系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #aaa;
+            font-size: 1.1em;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #e94560;
+        }
+        
+        .stat-label {
+            color: #aaa;
+            font-size: 0.9em;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .search-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+        
+        .search-box input:focus {
+            border-color: #e94560;
+        }
+        
+        .search-box button {
+            padding: 12px 24px;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .search-box button:hover {
+            background: #c73e54;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-tab {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .filter-tab.active {
+            background: #e94560;
+            color: white;
+            border-color: #e94560;
+        }
+        
+        .stock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .stock-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 5px solid;
+            transition: transform 0.2s;
+        }
+        
+        .stock-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        
+        .stock-card.green {
+            border-left-color: #28a745;
+            background: linear-gradient(135deg, #fff 0%, #f0fff4 100%);
+        }
+        
+        .stock-card.yellow {
+            border-left-color: #ffc107;
+            background: linear-gradient(135deg, #fff 0%, #fffbf0 100%);
+        }
+        
+        .stock-card.orange {
+            border-left-color: #fd7e14;
+            background: linear-gradient(135deg, #fff 0%, #fff5f0 100%);
+        }
+        
+        .stock-card.red {
+            border-left-color: #dc3545;
+            background: linear-gradient(135deg, #fff 0%, #fff0f3 100%);
+        }
+        
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .stock-name {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .stock-code {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .risk-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        
+        .risk-badge.green {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .risk-badge.yellow {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .risk-badge.orange {
+            background: #ffe0b2;
+            color: #e65100;
+        }
+        
+        .risk-badge.red {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .score-bar {
+            margin: 12px 0;
+        }
+        
+        .score-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .score-track {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .score-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .score-fill.green { background: #28a745; }
+        .score-fill.yellow { background: #ffc107; }
+        .score-fill.orange { background: #fd7e14; }
+        .score-fill.red { background: #dc3545; }
+        
+        .industry-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 8px;
+        }
+        
+        .detail-btn {
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: transparent;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            width: 100%;
+        }
+        
+        .detail-btn:hover {
+            border-color: #e94560;
+            color: #e94560;
+        }
+        
+        .disclaimer {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 40px;
+            font-size: 0.85em;
+            color: #856404;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 A股财务排雷系统</h1>
+        <p>基于53条规则、三层防御体系的财务造假鉴别智能体</p>
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number">53</div>
+                <div class="stat-label">检测规则</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">3</div>
+                <div class="stat-label">防御层级</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">100+</div>
+                <div class="stat-label">覆盖股票</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="输入股票代码或名称（如：600519 或 茅台）">
+            <button onclick="searchStock()">搜索</button>
+        </div>
+        
+        <div class="filter-tabs">
+            <div class="filter-tab active" onclick="filterStocks('all')">全部</div>
+            <div class="filter-tab" onclick="filterStocks('green')">低风险</div>
+            <div class="filter-tab" onclick="filterStocks('yellow')">中低风险</div>
+            <div class="filter-tab" onclick="filterStocks('orange')">中高风险</div>
+            <div class="filter-tab" onclick="filterStocks('red')">高风险</div>
+        </div>
+        
+        <div class="stock-grid" id="stockGrid">
+            <!-- 股票卡片由 JS 动态生成 -->
+        </div>
+        
+        <div class="disclaimer">
+            <strong>⚠️ 免责声明：</strong>本系统基于公开财务数据的算法分析，仅供参考，不构成投资建议。分析结果不代表对该公司存在财务造假的认定。投资者应独立判断，自行承担投资风险。
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>© 2026 A股财务排雷系统 | GitHub: Mindy3366/a-stock-fraud-scanner</p>
+    </div>
+    
+    <script>
+        // 预计算的股票数据（后续可扩展）
+        const stockData = [
+            { code: '600519', name: '贵州茅台', industry: '白酒', rating: '低风险', score: 4, level: 'green', flags: 0 },
+            { code: '000858', name: '五粮液', industry: '白酒', rating: '中低风险', score: 13, level: 'yellow', flags: 2 },
+            { code: '300750', name: '宁德时代', industry: '新能源', rating: '低风险', score: 0, level: 'green', flags: 0 },
+            { code: '600036', name: '招商银行', industry: '银行', rating: '低风险', score: 2, level: 'green', flags: 0 },
+            { code: '601318', name: '中国平安', industry: '保险', rating: '中低风险', score: 8, level: 'yellow', flags: 1 },
+            { code: '000333', name: '美的集团', industry: '家电', rating: '低风险', score: 3, level: 'green', flags: 0 },
+            { code: '002415', name: '海康威视', industry: '科技', rating: '低风险', score: 5, level: 'green', flags: 0 },
+            { code: '600276', name: '恒瑞医药', industry: '医药', rating: '中低风险', score: 10, level: 'yellow', flags: 1 },
+            { code: '601888', name: '中国中免', industry: '免税', rating: '中高风险', score: 18, level: 'orange', flags: 3 },
+            { code: '300059', name: '东方财富', industry: '金融科技', rating: '中低风险', score: 9, level: 'yellow', flags: 1 },
+            { code: '600900', name: '长江电力', industry: '水电', rating: '低风险', score: 1, level: 'green', flags: 0 },
+            { code: '601012', name: '隆基绿能', industry: '新能源', rating: '中高风险', score: 16, level: 'orange', flags: 2 },
+            { code: '002594', name: '比亚迪', industry: '新能源', rating: '低风险', score: 6, level: 'green', flags: 0 },
+            { code: '300014', name: '亿纬锂能', industry: '新能源', rating: '中低风险', score: 11, level: 'yellow', flags: 1 },
+            { code: '600309', name: '万华化学', industry: '化工', rating: '低风险', score: 3, level: 'green', flags: 0 },
+            { code: '600436', name: '片仔癀', industry: '医药', rating: '低风险', score: 4, level: 'green', flags: 0 },
+            { code: '000538', name: '云南白药', industry: '医药', rating: '低风险', score: 5, level: 'green', flags: 0 },
+            { code: '603288', name: '海天味业', industry: '食品', rating: '低风险', score: 4, level: 'green', flags: 0 },
+            { code: '600887', name: '伊利股份', industry: '乳业', rating: '低风险', score: 3, level: 'green', flags: 0 },
+            { code: '601899', name: '紫金矿业', industry: '有色', rating: '中低风险', score: 7, level: 'yellow', flags: 1 },
+            { code: '601398', name: '工商银行', industry: '银行', rating: '低风险', score: 2, level: 'green', flags: 0 },
+            { code: '601939', name: '建设银行', industry: '银行', rating: '低风险', score: 2, level: 'green', flags: 0 },
+            { code: '601288', name: '农业银行', industry: '银行', rating: '低风险', score: 2, level: 'green', flags: 0 },
+            { code: '601988', name: '中国银行', industry: '银行', rating: '低风险', score: 2, level: 'green', flags: 0 },
+            { code: '601328', name: '交通银行', industry: '银行', rating: '低风险', score: 2, level: 'green', flags: 0 },
+            { code: '600518', name: '康美药业', industry: '医药', rating: '极高风险', score: 23, level: 'red', flags: 5 },
+        ];
+        
+        function renderStocks(stocks) {
+            const grid = document.getElementById('stockGrid');
+            grid.innerHTML = stocks.map(stock => `
+                <div class="stock-card ${stock.level}">
+                    <div class="stock-header">
+                        <div>
+                            <div class="stock-name">${stock.name}</div>
+                            <div class="stock-code">${stock.code}</div>
+                        </div>
+                        <div class="risk-badge ${stock.level}">${stock.rating}</div>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-label">
+                            <span>风险得分</span>
+                            <span>${stock.score}/100</span>
+                        </div>
+                        <div class="score-track">
+                            <div class="score-fill ${stock.level}" style="width: ${stock.score}%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="industry-tag">${stock.industry}</span>
+                        ${stock.flags > 0 ? `<span class="industry-tag" style="background: #fee; color: #c33;">${stock.flags}个警报</span>` : ''}
+                    </div>
+                    <button class="detail-btn" onclick="alert('${stock.name}(${stock.code})\\n评级: ${stock.rating}\\n得分: ${stock.score}/100\\n行业: ${stock.industry}\\n警报: ${stock.flags}个')">查看详情</button>
+                </div>
+            `).join('');
+        }
+        
+        function searchStock() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = stockData.filter(s => 
+                s.code.includes(query) || s.name.includes(query) || s.industry.includes(query)
+            );
+            renderStocks(filtered);
+        }
+        
+        function filterStocks(level) {
+            // 更新标签样式
+            document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // 过滤数据
+            if (level === 'all') {
+                renderStocks(stockData);
+            } else {
+                const filtered = stockData.filter(s => s.level === level);
+                renderStocks(filtered);
+            }
+        }
+        
+        // 搜索框回车事件
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchStock();
+        });
+        
+        // 初始渲染
+        renderStocks(stockData);
+    </script>
+</body>
+</html>
