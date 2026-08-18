@@ -19,4 +19,5 @@
 ## 使用方式
 
 ```bash
+
 python scripts/run_demo.py --ticker 600519 --industry 白酒 --years 3 --skip-llm
