@@ -104,6 +104,10 @@ def main():
         print(f"  RED_FLAG: {rp.red_flag_count}")
         print(f"  造假类型: {', '.join(rp.fraud_types[:5]) if rp.fraud_types else '无'}")
         print(f"  置信度: {rp.confidence*100:.0f}%")
+        rt = report.realtime_price
+        if rt and "error" not in rt:
+            sign = "+" if rt.get("change_pct", 0) >= 0 else ""
+            print(f"  实时行情: {rt['price']:.2f}元 ({sign}{rt['change_pct']:.2f}%) [仅作参考]")
         print(f"  报告: {text_path}")
         if chart_path:
             print(f"  图表: {chart_path}")

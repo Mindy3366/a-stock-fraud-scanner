@@ -265,6 +265,9 @@ class ReportGenerator:
         lines.append("  [!!] 本报告为自动化分析工具输出，不构成投资建议。")
         lines.append("  [!!] 所有结论请结合专业人士判断使用。")
 
+        # ====== 实时行情（仅作参考，不纳入风险评分） ======
+        self._append_realtime_section(lines)
+
         lines.append("")
         lines.append("=" * 72)
 
@@ -433,6 +436,28 @@ class ReportGenerator:
         ax.set_aspect("equal")
         ax.axis("off")
         ax.set_title("综合风险得分", fontsize=13, y=0.98)
+
+    def _append_realtime_section(self, lines: List[str]):
+        """附加 [实时行情] 章节（仅作参考，不纳入风险评分）"""
+        rt = self.r.realtime_price
+        if not rt:
+            return
+        lines.append("")
+        lines.append("[实时行情]")
+        if "error" in rt:
+            lines.append(f"  {rt['error']}")
+            lines.append("  【实时行情仅作参考，不纳入风险评分】")
+            return
+
+        change_pct = rt.get("change_pct", 0.0)
+        sign = "+" if change_pct >= 0 else ""
+        lines.append(f"  最新价: {rt.get('price', 0.0):.2f} 元")
+        lines.append(f"  涨跌幅: {sign}{change_pct:.2f}%")
+        lines.append(f"  成交量: {rt.get('volume', 0.0):,.0f} 手")
+        lines.append(f"  成交额: {rt.get('turnover', 0.0)/1e8:.2f} 亿元")
+        if rt.get("update_time"):
+            lines.append(f"  更新时间: {rt['update_time']}")
+        lines.append("  【实时行情仅作参考，不纳入风险评分】")
 
     def _all_results(self) -> List[RuleResult]:
         return (self.r.fraud_results + self.r.manipulation_results

@@ -148,6 +148,10 @@ def main():
             print(f"  红色警报: {rp.red_flag_count}个商业逻辑矛盾")
         print(f"  造假类型: {', '.join(rp.fraud_types[:5]) if rp.fraud_types else '无匹配'}")
         print(f"  置信度: {rp.confidence*100:.0f}%")
+        rt = report.realtime_price
+        if rt and "error" not in rt:
+            sign = "+" if rt.get("change_pct", 0) >= 0 else ""
+            print(f"  实时行情: {rt['price']:.2f}元 ({sign}{rt['change_pct']:.2f}%) [仅作参考]")
         if rp.llm_summary:
             print(f"  LLM分析: {rp.llm_summary[:120]}...")
         print("=" * 60)

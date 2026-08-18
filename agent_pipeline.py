@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from data_fetcher import DataFetcher, FinancialData
+from data_fetcher import DataFetcher, FinancialData, fetch_realtime_price
 from indicator_calc import IndicatorCalculator
 from rule_engine import RuleEngine, RuleResult, DeepAuditResult
 from accounting_crosscheck import AccountingCrossChecker, CrossCheckResult
@@ -69,6 +69,9 @@ class AnalysisReport:
     # 关键指标
     key_indicators_summary: Dict[str, Dict[int, float]] = field(default_factory=dict)
 
+    # 实时行情（仅作参考，不纳入风险评分）
+    realtime_price: Optional[Dict] = None
+
     # 执行元数据
     execution_time_seconds: float = 0.0
     execution_steps: List[str] = field(default_factory=list)
@@ -109,7 +112,28 @@ class FraudDetectionAgent:
         self._log("STEP 1: 数据收集与预处理")
         fetcher = DataFetcher(source="manual" if manual_data else self.data_source,
                               tushare_token=self.tushare_token)
-        self.data = fetcher.fetch(stock_code, years, data=manual_data) if manual_data else fetcher.fetch(stock_code, years)
+
+        # 同时拉取财务数据与实时行情：两者独立，实时行情异常不影响财务风险分析
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=2) as ex:
+            if manual_data:
+                fin_future = ex.submit(fetcher.fetch, stock_code, years, data=manual_data)
+            else:
+                fin_future = ex.submit(fetcher.fetch, stock_code, years)
+            rt_future = ex.submit(fetch_realtime_price, stock_code)
+            self.data = fin_future.result()
+            try:
+                self.report.realtime_price = rt_future.result()
+            except Exception as e:
+                self._log(f"  实时行情获取异常: {e}")
+                self.report.realtime_price = None
+
+        rt = self.report.realtime_price
+        if rt and "error" in rt:
+            self._log(f"  实时行情: {rt['error']}")
+        elif rt:
+            self._log(f"  实时行情: 最新价 {rt['price']:.2f} 元, 涨跌幅 {rt['change_pct']:+.2f}%")
+
         self.report.company_name = self.data.company_name
         self.report.stock_code = stock_code
         self.report.industry = self.data.industry

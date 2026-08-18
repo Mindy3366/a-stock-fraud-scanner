@@ -351,6 +351,45 @@ class DataFetcher:
         return fd
 
 
+def fetch_realtime_price(ticker: str) -> Dict:
+    """
+    获取A股实时行情（东方财富接口）。
+
+    - ticker: 股票代码，如 '600519'
+    - 返回: {"price": 最新价, "change_pct": 涨跌幅, "volume": 成交量(手),
+             "turnover": 成交额(元), "update_time": 更新时间}
+    - 失败时返回: {"error": 错误信息}
+    """
+    try:
+        import akshare as ak
+    except ImportError:
+        return {"error": "请安装 akshare: pip install akshare"}
+
+    from datetime import datetime
+
+    try:
+        warnings.filterwarnings("ignore")
+        df = ak.stock_zh_a_spot_em()
+        if df is None or df.empty:
+            return {"error": "实时行情接口返回空数据"}
+
+        code = str(ticker).zfill(6)
+        row = df[df["代码"].astype(str).str.zfill(6) == code]
+        if len(row) == 0:
+            return {"error": f"未找到股票 {code} 的实时行情"}
+
+        row = row.iloc[0]
+        return {
+            "price": float(row["最新价"]),
+            "change_pct": float(row["涨跌幅"]),
+            "volume": float(row["成交量"]),    # 单位：手
+            "turnover": float(row["成交额"]),  # 单位：元
+            "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        }
+    except Exception as e:
+        return {"error": f"实时行情获取失败: {e}"}
+
+
 def _guess_industry(stock_code: str) -> str:
     """根据股票代码猜测行业（简版）"""
     industry_map = {
