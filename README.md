@@ -1,4 +1,4 @@
-## A股财务造假鉴别智能体
+# A股财务造假鉴别智能体
 
 基于53条规则、三层防御体系的A股财务造假鉴别系统。
 
@@ -19,5 +19,4 @@
 ## 使用方式
 
 ```bash
-
 python scripts/run_demo.py --ticker 600519 --industry 白酒 --years 3 --skip-llm
