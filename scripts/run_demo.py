@@ -84,6 +84,7 @@ def main():
     output_dir = os.path.join(os.path.dirname(__file__), args.output) if not os.path.isabs(args.output) else args.output
     generator = ReportGenerator(report, output_dir=output_dir)
     text_path = generator.save_text_report()
+    html_path = generator.save_html_report()
 
     try:
         chart_path = generator.generate_visualization()
@@ -109,6 +110,7 @@ def main():
             sign = "+" if rt.get("change_pct", 0) >= 0 else ""
             print(f"  实时行情: {rt['price']:.2f}元 ({sign}{rt['change_pct']:.2f}%) [仅作参考]")
         print(f"  报告: {text_path}")
+        print(f"  HTML报告: {html_path}")
         if chart_path:
             print(f"  图表: {chart_path}")
         print("=" * 60)

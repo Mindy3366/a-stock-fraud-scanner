@@ -125,6 +125,7 @@ def main():
 
     generator = ReportGenerator(report, output_dir=args.output)
     text_path = generator.save_text_report()
+    html_path = generator.save_html_report()
 
     chart_path = None
     if not args.no_viz:
@@ -156,6 +157,7 @@ def main():
             print(f"  LLM分析: {rp.llm_summary[:120]}...")
         print("=" * 60)
         print(f"  文本报告: {text_path}")
+        print(f"  HTML报告: {html_path}")
         if chart_path:
             print(f"  可视化:   {chart_path}")
 
