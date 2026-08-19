@@ -454,7 +454,7 @@ class ReportGenerator:
         lines.append(f"  最新价: {rt.get('price', 0.0):.2f} 元")
         lines.append(f"  涨跌幅: {sign}{change_pct:.2f}%")
         lines.append(f"  成交量: {rt.get('volume', 0.0):,.0f} 手")
-        lines.append(f"  成交额: {rt.get('turnover', 0.0)/1e8:.2f} 亿元")
+        lines.append(f"  成交额: {rt.get('turnover', 0.0):.2f} 亿元")
         if rt.get("update_time"):
             lines.append(f"  更新时间: {rt['update_time']}")
         lines.append("  【实时行情仅作参考，不纳入风险评分】")

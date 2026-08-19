@@ -353,11 +353,11 @@ class DataFetcher:
 
 def fetch_realtime_price(ticker: str) -> Dict:
     """
-    获取A股实时行情（东方财富接口）。
+    获取A股实时行情（新浪财经接口，替代被东方财富拒绝的 stock_zh_a_spot_em）。
 
-    - ticker: 股票代码，如 '600519'
+    - ticker: 6位股票代码，如 '600519'
     - 返回: {"price": 最新价, "change_pct": 涨跌幅, "volume": 成交量(手),
-             "turnover": 成交额(元), "update_time": 更新时间}
+             "turnover": 成交额(亿元), "update_time": 时间}
     - 失败时返回: {"error": 错误信息}
     """
     try:
@@ -365,29 +365,38 @@ def fetch_realtime_price(ticker: str) -> Dict:
     except ImportError:
         return {"error": "请安装 akshare: pip install akshare"}
 
-    from datetime import datetime
-
     try:
         warnings.filterwarnings("ignore")
-        df = ak.stock_zh_a_spot_em()
+
+        # 拼接交易所前缀: 6→sh, 0/3→sz, 8/4/9→bj(北交所, 含新920代码段)
+        code = str(ticker).zfill(6)
+        if code.startswith("6"):
+            symbol = "sh" + code
+        elif code.startswith(("0", "3")):
+            symbol = "sz" + code
+        elif code.startswith(("8", "4", "9")):
+            symbol = "bj" + code
+        else:
+            return {"error": f"无法识别交易所前缀: {code}"}
+
+        df = ak.stock_zh_a_spot()
         if df is None or df.empty:
             return {"error": "实时行情接口返回空数据"}
 
-        code = str(ticker).zfill(6)
-        row = df[df["代码"].astype(str).str.zfill(6) == code]
+        row = df[df["代码"].astype(str) == symbol]
         if len(row) == 0:
-            return {"error": f"未找到股票 {code} 的实时行情"}
+            return {"error": f"未找到股票 {symbol} 的实时行情"}
 
         row = row.iloc[0]
         return {
             "price": float(row["最新价"]),
             "change_pct": float(row["涨跌幅"]),
-            "volume": float(row["成交量"]),    # 单位：手
-            "turnover": float(row["成交额"]),  # 单位：元
-            "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "volume": int(float(row["成交量"]) / 100),  # 新浪成交量单位:股 → 手
+            "turnover": float(row["成交额"]) / 1e8,      # 元 → 亿元
+            "update_time": str(row["时间戳"]),
         }
     except Exception as e:
-        return {"error": f"实时行情获取失败: {e}"}
+        return {"error": str(e)}
 
 
 def _guess_industry(stock_code: str) -> str:
