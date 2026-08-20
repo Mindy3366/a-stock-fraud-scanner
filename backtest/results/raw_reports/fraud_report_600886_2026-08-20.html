@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>财务造假识别报告</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif; }
+  .chart-box { width: 100%; height: 300px; }
+  .empty-box { width: 100%; height: 300px; display: none; flex-direction: column; align-items: center; justify-content: center; }
+  @media print {
+    body { background: #fff !important; }
+    .no-print { display: none !important; }
+    main { max-width: 100% !important; padding: 0 !important; }
+    .card { box-shadow: none !important; border-color: #e5e7eb !important; page-break-inside: avoid; }
+    .chart-box { height: 280px !important; }
+  }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+<main class="max-w-7xl mx-auto px-4 py-6">
+
+  <!-- 头部 -->
+  <header class="card bg-white rounded-xl shadow-sm border border-gray-100 px-6 py-5 mb-6">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">财务报表排雷分析报告</h1>
+        <div class="mt-1 flex flex-wrap items-center gap-3 text-sm text-gray-500">
+          <span id="companyName" class="font-medium text-gray-700"></span>
+          <span id="stockCode" class="px-2 py-0.5 bg-gray-100 rounded text-gray-600"></span>
+          <span id="industry" class="px-2 py-0.5 bg-blue-50 text-blue-600 rounded"></span>
+          <span id="analysisPeriod" class="text-gray-400"></span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="riskBadge" class="px-4 py-2 rounded-lg text-white font-semibold text-lg"></span>
+        <button onclick="window.print()" class="no-print px-3 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">打印报告</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 第1行 -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="card bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+      <h2 class="text-base font-semibold text-gray-700 mb-2">综合风险得分</h2>
+      <div id="gaugeChart" class="chart-box"></div>
+    </div>
+    <div class="card bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+      <h2 class="text-base font-semibold text-gray-700 mb-2">各级风险触发</h2>
+      <div id="levelsChart" class="chart-box"></div>
+    </div>
+    <div class="card bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+      <h2 class="text-base font-semibold text-gray-700 mb-2">规则判定分布</h2>
+      <div id="verdictChart" class="chart-box"></div>
+    </div>
+  </div>
+
+  <!-- 第2行 -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="card bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+      <h2 class="text-base font-semibold text-gray-700 mb-2">造假类型热力矩阵</h2>
+      <div id="heatmapChart" class="chart-box"></div>
+      <div id="heatmapEmpty" class="empty-box text-gray-400">
+        <svg class="w-12 h-12 mb-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/></svg>
+        <p>暂无造假类型数据</p>
+      </div>
+    </div>
+    <div class="card bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+      <h2 class="text-base font-semibold text-gray-700 mb-2">关键指标趋势</h2>
+      <div id="trendChart" class="chart-box"></div>
+      <div id="trendEmpty" class="empty-box text-gray-400">
+        <svg class="w-12 h-12 mb-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/></svg>
+        <p>暂无关键指标数据</p>
+      </div>
+    </div>
+    <div class="card bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+      <h2 class="text-base font-semibold text-gray-700 mb-2">TOP风险证据链</h2>
+      <div id="evidenceChart" class="chart-box"></div>
+      <div id="evidenceEmpty" class="empty-box text-gray-400">
+        <svg class="w-12 h-12 mb-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/></svg>
+        <p>暂无证据链数据</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 第3行 -->
+  <div class="card bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
+    <h2 class="text-base font-semibold text-gray-700 mb-4">实时行情 <span class="text-xs font-normal text-gray-400">（仅作参考，不纳入风险评分）</span></h2>
+    <div id="realtimeOk" style="display:none">
+      <div class="flex flex-wrap items-end gap-x-10 gap-y-4">
+        <div>
+          <p class="text-xs text-gray-400 mb-1">最新价</p>
+          <div class="flex items-baseline gap-3">
+            <span id="rtPrice" class="text-4xl font-bold text-gray-900"></span>
+            <span id="rtChange" class="text-xl font-semibold"></span>
+          </div>
+        </div>
+        <div><p class="text-xs text-gray-400 mb-1">成交量</p><p id="rtVolume" class="text-lg font-medium text-gray-800"></p></div>
+        <div><p class="text-xs text-gray-400 mb-1">成交额</p><p id="rtTurnover" class="text-lg font-medium text-gray-800"></p></div>
+        <div><p class="text-xs text-gray-400 mb-1">更新时间</p><p id="rtTime" class="text-lg font-medium text-gray-800"></p></div>
+      </div>
+    </div>
+    <div id="realtimeFail" style="display:none" class="items-center gap-3 text-gray-400">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+      <span>实时行情获取失败</span>
+    </div>
+  </div>
+
+  <!-- 底部元信息 -->
+  <footer class="text-sm text-gray-400 text-center py-6">
+    <p class="mb-1">
+      置信度 <span id="metaConfidence" class="text-gray-600 font-medium"></span>
+      ｜ 数据源 <span id="metaSource" class="text-gray-600"></span>
+      ｜ 报告日期 <span id="metaDate" class="text-gray-600"></span>
+    </p>
+    <p class="mb-1">本报告由自动化分析工具生成，不构成投资建议。所有结论请结合专业人士判断使用。</p>
+  </footer>
+
+</main>
+
+<script>
+var D = {"gauge": {"score": 20, "band_cn": "中风险", "color": "#ff9800"}, "levels": {"names": ["10级 疑似造假", "8级 疑似操纵", "5级 盈余管理", "3级 经营风险"], "values": [1, 0, 0, 3], "colors": ["#d32f2f", "#f57c00", "#fbc02d", "#1976d2"]}, "verdicts": {"names": ["PASS 通过", "WARN 预警", "FAIL 失败", "MISSING 缺失"], "values": [19, 6, 2, 7], "colors": ["#4caf50", "#ff9800", "#f44336", "#9e9e9e"]}, "verdict_total": 34, "heatmap": {"types": ["存贷双高型", "存货魔术型", "收入跨期型", "关联交易型", "境外虚构型", "合同资产型", "资金占用型", "减值调节型", "差错更造型", "商誉洗澡型", "递延所得税型", "利润平滑型", "费用资本化型", "预告修正型", "人力资本型"], "years": [2023, 2024, 2025], "data": [[1, 2, 1]], "max": 1}, "trend": {"years": [], "series": [], "has_data": false}, "evidences": {"names": ["短期偿债压力大", "资本回报不足", "期间费用-支付勾稽", "存货-毛利率背离", "毛利率vs研发投入匹配"], "descs": ["短期偿债能力不足", "ROA < 3年期国债收益率(约2.5%)", "费用率异常低 → 可能将期间费用资本化(如研发资本化、利息资本化)或推迟确认", "存货周转放缓伴随毛利率微升，需关注", "高毛利率意味着强定价权/技术壁垒，但极低的研发投入无法支撑技术壁垒。要么毛利率造假，要么技术壁垒不存在(毛利率无法持续)。A股典型: 毛利率50%+但研发费率<2%的'高科技'企业。"], "values": [3.0, 3.0, 6.0, 8.0, 10.0]}, "realtime": {"ok": false, "price": null, "change_pct": null, "volume": null, "turnover": null, "update_time": null, "error": ""}, "meta": {"company_name": "600886", "stock_code": "600886", "industry": "公用事业", "risk_band_cn": "中风险", "gauge_color": "#ff9800", "confidence": 0.55, "confidence_reason": "中低 — 部分数据缺失，结论需补充信息验证", "data_source": "akshare", "report_date": "2026-08-20", "analysis_period": "2023-2025"}};
+var charts = [];
+function el(id) { return document.getElementById(id); }
+
+// ---- 头部 ----
+el('companyName').textContent = D.meta.company_name;
+el('stockCode').textContent = D.meta.stock_code;
+el('industry').textContent = D.meta.industry || '—';
+el('analysisPeriod').textContent = D.meta.analysis_period ? ('分析期间 ' + D.meta.analysis_period) : '';
+var badge = el('riskBadge');
+badge.textContent = D.meta.risk_band_cn;
+badge.style.backgroundColor = D.meta.gauge_color;
+
+// ---- 综合风险得分 gauge ----
+var gauge = echarts.init(el('gaugeChart'));
+gauge.setOption({
+  series: [{
+    type: 'gauge', startAngle: 210, endAngle: -30, min: 0, max: 100, splitNumber: 10, radius: '95%',
+    axisLine: { lineStyle: { width: 16, color: [[D.gauge.score / 100, D.gauge.color], [1, '#e5e7eb']] } },
+    pointer: { length: '62%', width: 5, itemStyle: { color: '#1f2937' } },
+    axisTick: { distance: -16, length: 5, lineStyle: { color: '#fff', width: 2 } },
+    splitLine: { distance: -16, length: 16, lineStyle: { color: '#fff', width: 3 } },
+    axisLabel: { distance: 18, color: '#9ca3af', fontSize: 10 },
+    anchor: { show: true, size: 12, itemStyle: { color: D.gauge.color } },
+    title: { offsetCenter: [0, '72%'], fontSize: 14, color: '#6b7280' },
+    detail: { valueAnimation: true, offsetCenter: [0, '38%'], fontSize: 42, fontWeight: 'bolder', color: D.gauge.color, formatter: '{value}' },
+    data: [{ value: D.gauge.score, name: D.gauge.band_cn }]
+  }]
+});
+charts.push(gauge);
+
+// ---- 各级风险触发（横向条形图）----
+var levels = echarts.init(el('levelsChart'));
+levels.setOption({
+  grid: { left: 8, right: 40, top: 8, bottom: 8, containLabel: true },
+  xAxis: { type: 'value', splitLine: { lineStyle: { color: '#f3f4f6' } }, axisLabel: { color: '#9ca3af' } },
+  yAxis: { type: 'category', data: D.levels.names, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#6b7280' } },
+  series: [{
+    type: 'bar', data: D.levels.values, barWidth: 20,
+    label: { show: true, position: 'right', fontWeight: 'bold', color: '#374151' },
+    itemStyle: { borderRadius: [0, 6, 6, 0], color: function (p) { return D.levels.colors[p.dataIndex]; } }
+  }]
+});
+charts.push(levels);
+
+// ---- 规则判定分布（环形图）----
+var verdict = echarts.init(el('verdictChart'));
+verdict.setOption({
+  tooltip: { trigger: 'item' },
+  legend: { orient: 'vertical', right: '2%', top: 'center', textStyle: { color: '#6b7280' } },
+  title: { text: String(D.verdict_total), subtext: '总判定', left: '32%', top: '40%', textAlign: 'center', textStyle: { fontSize: 30, fontWeight: 'bold', color: '#374151' }, subtextStyle: { color: '#9ca3af' } },
+  series: [{
+    type: 'pie', radius: ['55%', '78%'], center: ['32%', '50%'],
+    avoidLabelOverlap: true, itemStyle: { borderColor: '#fff', borderWidth: 2, borderRadius: 5 },
+    label: { show: false }, labelLine: { show: false },
+    data: D.verdicts.names.map(function (n, i) { return { name: n, value: D.verdicts.values[i], itemStyle: { color: D.verdicts.colors[i] } }; })
+  }]
+});
+charts.push(verdict);
+
+// ---- 造假类型热力矩阵 ----
+if (D.heatmap.types.length) {
+  var heatmap = echarts.init(el('heatmapChart'));
+  heatmap.setOption({
+    tooltip: { position: 'top', formatter: function (p) { return D.heatmap.types[p.value[0]] + ' · ' + D.heatmap.years[p.value[1]] + '：' + p.value[2] + ' 次'; } },
+    grid: { left: 8, right: 8, top: 8, bottom: 70, containLabel: true },
+    xAxis: { type: 'category', data: D.heatmap.types, splitArea: { show: true }, axisLabel: { color: '#6b7280', rotate: 25 } },
+    yAxis: { type: 'category', data: D.heatmap.years, splitArea: { show: true }, axisLabel: { color: '#6b7280' } },
+    visualMap: { min: 0, max: D.heatmap.max, calculable: true, orient: 'horizontal', left: 'center', bottom: 0, itemWidth: 12, itemHeight: 90, textStyle: { color: '#9ca3af' }, inRange: { color: ['#f3f4f6', '#fecaca', '#f87171', '#dc2626', '#991b1b'] } },
+    series: [{
+      type: 'heatmap', data: D.heatmap.data,
+      label: { show: true, color: '#374151', fontSize: 11, formatter: function (p) { return p.value[2] > 0 ? p.value[2] : ''; } },
+      emphasis: { itemStyle: { shadowBlur: 8, shadowColor: 'rgba(0,0,0,0.25)' } }
+    }]
+  });
+  charts.push(heatmap);
+} else {
+  el('heatmapChart').style.display = 'none';
+  el('heatmapEmpty').style.display = 'flex';
+}
+
+// ---- 关键指标趋势 ----
+if (D.trend.has_data) {
+  var trend = echarts.init(el('trendChart'));
+  trend.setOption({
+    tooltip: { trigger: 'axis' },
+    legend: { bottom: 0, type: 'scroll', textStyle: { color: '#6b7280' } },
+    grid: { left: 8, right: 16, top: 16, bottom: 50, containLabel: true },
+    xAxis: { type: 'category', data: D.trend.years, boundaryGap: false, axisLabel: { color: '#9ca3af' } },
+    yAxis: { type: 'value', splitLine: { lineStyle: { color: '#f3f4f6' } }, axisLabel: { color: '#9ca3af' } },
+    series: D.trend.series.map(function (s) { return { name: s.name, type: 'line', smooth: true, symbol: 'circle', data: s.data }; })
+  });
+  charts.push(trend);
+} else {
+  el('trendChart').style.display = 'none';
+  el('trendEmpty').style.display = 'flex';
+}
+
+// ---- TOP风险证据链 ----
+if (D.evidences.names.length) {
+  var evidence = echarts.init(el('evidenceChart'));
+  evidence.setOption({
+    tooltip: { trigger: 'item', formatter: function (p) { return p.name + '：' + D.evidences.descs[p.dataIndex] + '<br/>权重 ' + p.value; } },
+    grid: { left: 8, right: 50, top: 8, bottom: 8, containLabel: true },
+    xAxis: { type: 'value', splitLine: { lineStyle: { color: '#f3f4f6' } }, axisLabel: { color: '#9ca3af' } },
+    yAxis: { type: 'category', data: D.evidences.names, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#6b7280' } },
+    series: [{
+      type: 'bar', data: D.evidences.values, barWidth: 16,
+      label: { show: true, position: 'right', color: '#374151' },
+      itemStyle: { borderRadius: [0, 6, 6, 0], color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{ offset: 0, color: '#3b82f6' }, { offset: 1, color: '#8b5cf6' }]) }
+    }]
+  });
+  charts.push(evidence);
+} else {
+  el('evidenceChart').style.display = 'none';
+  el('evidenceEmpty').style.display = 'flex';
+}
+
+// ---- 实时行情卡片 ----
+if (D.realtime.ok) {
+  el('realtimeOk').style.display = 'block';
+  el('rtPrice').textContent = Number(D.realtime.price).toFixed(2) + ' 元';
+  var pct = Number(D.realtime.change_pct);
+  var chg = el('rtChange');
+  chg.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
+  chg.style.color = pct >= 0 ? '#ef4444' : '#10b981';   // A股习惯：涨红跌绿
+  el('rtVolume').textContent = Number(D.realtime.volume).toLocaleString('zh-CN') + ' 手';
+  el('rtTurnover').textContent = Number(D.realtime.turnover).toFixed(2) + ' 亿元';
+  el('rtTime').textContent = D.realtime.update_time || '—';
+} else {
+  el('realtimeFail').style.display = 'flex';
+}
+
+// ---- 底部元信息 ----
+el('metaConfidence').textContent = (D.meta.confidence * 100).toFixed(0) + '%';
+el('metaSource').textContent = D.meta.data_source || '—';
+el('metaDate').textContent = D.meta.report_date || '—';
+
+// ---- resize ----
+window.addEventListener('resize', function () {
+  charts.forEach(function (c) { c.resize(); });
+});
+</script>
+</body>
+</html>
