@@ -31,8 +31,17 @@ def main():
     parser.add_argument("--years", type=int, default=5, help="分析年数")
     parser.add_argument("--output", type=str, default="../output", help="输出目录")
     parser.add_argument("--source", type=str, default="akshare", help="数据源")
+    parser.add_argument("--skip-realtime", action="store_true", help="跳过实时行情获取（批量回测加速）")
+    parser.add_argument("--no-viz", action="store_true", help="跳过可视化图表生成")
+    parser.add_argument("--start-year", type=int, default=None, help="指定抓取起始年份（与--end-year搭配，优先于--years）")
+    parser.add_argument("--end-year", type=int, default=None, help="指定抓取结束年份（与--start-year搭配，优先于--years）")
 
     args = parser.parse_args()
+
+    if (args.start_year is None) != (args.end_year is None):
+        parser.error("--start-year 与 --end-year 需同时提供")
+    if args.start_year is not None and args.end_year is not None and args.start_year > args.end_year:
+        parser.error("--start-year 不能大于 --end-year")
 
     if not args.ticker and not args.manual:
         parser.print_help()
@@ -78,6 +87,9 @@ def main():
         years=args.years,
         manual_data=manual_data,
         industry=args.industry,  # <-- 行业参数传入规则函数
+        skip_realtime=args.skip_realtime,
+        start_year=args.start_year,
+        end_year=args.end_year,
     )
 
     # 生成报告
@@ -86,11 +98,12 @@ def main():
     text_path = generator.save_text_report()
     html_path = generator.save_html_report()
 
-    try:
-        chart_path = generator.generate_visualization()
-    except Exception as e:
-        chart_path = None
-        print(f"[WARN] 可视化失败: {e}")
+    chart_path = None
+    if not args.no_viz:
+        try:
+            chart_path = generator.generate_visualization()
+        except Exception as e:
+            print(f"[WARN] 可视化失败: {e}")
 
     # 终端摘要
     rp = report.risk_profile

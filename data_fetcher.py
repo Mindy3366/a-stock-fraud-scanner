@@ -72,7 +72,9 @@ class DataFetcher:
         - years: 拉取近N年数据
         """
         if self.source == "akshare":
-            return self._fetch_akshare(stock_code, years)
+            return self._fetch_akshare(stock_code, years,
+                                       start_year=kwargs.get("start_year"),
+                                       end_year=kwargs.get("end_year"))
         elif self.source == "tushare":
             return self._fetch_tushare(stock_code, years)
         elif self.source == "manual":
@@ -83,7 +85,9 @@ class DataFetcher:
     # ================================================================
     # AKShare 数据源 — 新浪财经接口
     # ================================================================
-    def _fetch_akshare(self, stock_code: str, years: int) -> FinancialData:
+    def _fetch_akshare(self, stock_code: str, years: int,
+                       start_year: Optional[int] = None,
+                       end_year: Optional[int] = None) -> FinancialData:
         """
         使用 akshare + 新浪财经接口获取A股财报数据。
         之前使用的东方财富接口 (stock_*_by_report_em) 已失效，改用新浪。
@@ -102,8 +106,12 @@ class DataFetcher:
         data = FinancialData(stock_code=stock_code, company_name=company_name, industry=industry)
 
         from datetime import datetime
-        current_year = datetime.now().year
-        target_years = list(range(current_year - years, current_year + 1))
+        if start_year is not None and end_year is not None:
+            # 指定年份区间抓取（回测等场景）
+            target_years = list(range(int(start_year), int(end_year) + 1))
+        else:
+            current_year = datetime.now().year
+            target_years = list(range(current_year - years, current_year + 1))
 
         # 拉取新浪财经三表
         for stmt_cn, symbol in [

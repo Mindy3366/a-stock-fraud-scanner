@@ -104,7 +104,8 @@ class FraudDetectionAgent:
         self.report = AnalysisReport()
 
     def analyze(self, stock_code: str, years: int = 5, manual_data: Optional[dict] = None,
-                industry: str = "") -> AnalysisReport:
+                industry: str = "", skip_realtime: bool = False,
+                start_year: Optional[int] = None, end_year: Optional[int] = None) -> AnalysisReport:
         """主入口"""
         start_time = time.time()
 
@@ -113,26 +114,33 @@ class FraudDetectionAgent:
         fetcher = DataFetcher(source="manual" if manual_data else self.data_source,
                               tushare_token=self.tushare_token)
 
-        # 同时拉取财务数据与实时行情：两者独立，实时行情异常不影响财务风险分析
-        from concurrent.futures import ThreadPoolExecutor
-        with ThreadPoolExecutor(max_workers=2) as ex:
+        def _do_fetch():
             if manual_data:
-                fin_future = ex.submit(fetcher.fetch, stock_code, years, data=manual_data)
-            else:
-                fin_future = ex.submit(fetcher.fetch, stock_code, years)
-            rt_future = ex.submit(fetch_realtime_price, stock_code)
-            self.data = fin_future.result()
-            try:
-                self.report.realtime_price = rt_future.result()
-            except Exception as e:
-                self._log(f"  实时行情获取异常: {e}")
-                self.report.realtime_price = None
+                return fetcher.fetch(stock_code, years, data=manual_data)
+            return fetcher.fetch(stock_code, years, start_year=start_year, end_year=end_year)
 
-        rt = self.report.realtime_price
-        if rt and "error" in rt:
-            self._log(f"  实时行情: {rt['error']}")
-        elif rt:
-            self._log(f"  实时行情: 最新价 {rt['price']:.2f} 元, 涨跌幅 {rt['change_pct']:+.2f}%")
+        if skip_realtime:
+            # 仅拉取财务数据，跳过实时行情（批量回测等场景）
+            self.data = _do_fetch()
+            self.report.realtime_price = None
+        else:
+            # 同时拉取财务数据与实时行情：两者独立，实时行情异常不影响财务风险分析
+            from concurrent.futures import ThreadPoolExecutor
+            with ThreadPoolExecutor(max_workers=2) as ex:
+                fin_future = ex.submit(_do_fetch)
+                rt_future = ex.submit(fetch_realtime_price, stock_code)
+                self.data = fin_future.result()
+                try:
+                    self.report.realtime_price = rt_future.result()
+                except Exception as e:
+                    self._log(f"  实时行情获取异常: {e}")
+                    self.report.realtime_price = None
+
+            rt = self.report.realtime_price
+            if rt and "error" in rt:
+                self._log(f"  实时行情: {rt['error']}")
+            elif rt:
+                self._log(f"  实时行情: 最新价 {rt['price']:.2f} 元, 涨跌幅 {rt['change_pct']:+.2f}%")
 
         self.report.company_name = self.data.company_name
         self.report.stock_code = stock_code

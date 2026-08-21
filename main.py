@@ -46,6 +46,7 @@ def main():
     parser.add_argument("--manual", type=str, help="手动输入JSON文件路径")
     parser.add_argument("--output", type=str, default="./output", help="输出目录")
     parser.add_argument("--no-viz", action="store_true", help="跳过可视化")
+    parser.add_argument("--skip-realtime", action="store_true", help="跳过实时行情获取（批量回测加速）")
     parser.add_argument("--quiet", action="store_true", help="静默模式")
 
     # LLM选项
@@ -105,7 +106,7 @@ def main():
                 llm_api_key=args.apikey,
                 llm_api_base=args.apibase,
             )
-            report = agent.analyze(stock_code, years=args.years, manual_data=manual_data, industry=args.industry)
+            report = agent.analyze(stock_code, years=args.years, manual_data=manual_data, industry=args.industry, skip_realtime=args.skip_realtime)
     else:
         agent = FraudDetectionAgent(
             data_source=args.source,
@@ -115,7 +116,7 @@ def main():
             llm_api_key=args.apikey,
             llm_api_base=args.apibase,
         )
-        report = agent.analyze(stock_code, years=args.years, manual_data=manual_data, industry=args.industry)
+        report = agent.analyze(stock_code, years=args.years, manual_data=manual_data, industry=args.industry, skip_realtime=args.skip_realtime)
 
     # 生成报告
     print()
